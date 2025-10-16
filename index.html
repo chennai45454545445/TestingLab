@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Test Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .correct {
+            background-color: #10B981 !important; /* Green-500 */
+            color: white !important;
+            border-color: #059669 !important; /* Green-600 */
+        }
+        .incorrect {
+            background-color: #EF4444 !important; /* Red-500 */
+            color: white !important;
+            border-color: #DC2626 !important; /* Red-600 */
+        }
+        .disabled-option {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        .bilingual-text {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex items-center justify-center min-h-screen p-4">
+    <div class="container mx-auto max-w-2xl w-full">
+
+        <!-- Main Card -->
+        <div id="app-card" class="bg-white rounded-2xl shadow-2xl p-6 md:p-10 transition-all duration-500 border border-gray-200">
+
+            <!-- Screen 1: Welcome & Setup -->
+            <div id="setup-screen">
+                <div class="text-center mb-8">
+                    <!-- LOGO: KTP (Test your Knowledge) -->
+                    <div class="flex flex-col items-center mb-3">
+                        <div class="text-center">
+                            <h1 class="text-6xl font-black text-indigo-700 tracking-tighter relative inline-block select-none">
+                                KTP
+                            </h1>
+                            <p class="text-base text-gray-500 font-semibold mt-1">
+                                (Test your Knowledge)
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Main Title -->
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-indigo-800 tracking-tight">Knowledge Test Portal</h2>
+                    <p class="text-lg text-indigo-500 font-medium mt-1 border-t-2 border-indigo-200 pt-2">Register or Login to Test Yourself</p>
+                </div>
+                <!-- Welcome Message Box -->
+                <div class="bg-indigo-50 border-l-4 border-indigo-600 text-indigo-800 p-4 rounded-xl mb-8 shadow-sm">
+                    <p class="text-sm">
+                        This is your personal arena to <strong class="font-semibold">challenge yourself</strong>. Free users can access **3 topics per day** (max 10 MCQs each). <strong class="font-semibold">Unlock unlimited access with a Monthly Pass!</strong>
+                    </p>
+                </div>
+                <form id="setup-form" class="space-y-5">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" placeholder="e.g., Rohan Kumar" required>
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email ID</label>
+                        <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" placeholder="e.g., rohan@example.com" required>
+                    </div>
+                    <div>
+                        <label for="contact" class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                        <input type="tel" id="contact" name="contact" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" placeholder="e.g., 9876543210" required>
+                    </div>
+                    
+                    <div id="quiz-input-section" class="space-y-4 pt-4 border-t border-gray-200">
+                        <div>
+                            <label for="topic" class="block text-sm font-medium text-gray-700 mb-1">Quiz Topic (e.g., Basic Accounting)</label>
+                            <textarea id="topic" name="topic" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" placeholder="e.g., Generate MCQs on Basic Accounting" required></textarea>
+                        </div>
+                        <div>
+                            <label for="count" class="block text-sm font-medium text-gray-700 mb-1">Number of MCQs (Max 10 for Free Users)</label>
+                            <input type="number" id="count" name="count" min="1" max="10" value="10" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-sm" required>
+                        </div>
+                    </div>
+
+                    <!-- User Limits Info (Dynamic) -->
+                    <div id="user-status" class="text-center text-sm font-medium pt-2">
+                        <!-- Status will be injected here -->
+                    </div>
+
+                    <!-- Start Quiz/Login Button -->
+                    <button type="submit" class="w-full bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 shadow-lg mt-6">
+                        Start Quiz / Register
+                    </button>
+                </form>
+                 <!-- Contact Email -->
+                <div class="text-center mt-6 pt-4 border-t border-gray-200">
+                    <p class="text-sm text-gray-500">
+                        Contact: <a href="mailto:reliable011990@gmail.com" class="text-indigo-600 hover:text-indigo-800 font-medium transition">reliable011990@gmail.com</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Screen 2: Quiz -->
+            <div id="quiz-screen" class="hidden">
+                <div class="flex justify-between items-center mb-4 pb-4 border-b border-indigo-200">
+                    <!-- Updated Score Color -->
+                    <div id="score" class="text-xl font-bold text-indigo-600">Score: 0 / 0</div>
+                    <div id="timer" class="text-lg font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full shadow-md">
+                        <span id="time-left">45</span>s
+                    </div>
+                </div>
+                <div id="question-container" class="mb-6">
+                    <h2 class="text-xl md:text-2xl font-semibold mb-4 bilingual-text" id="question-text">
+                        <!-- Question will be injected here -->
+                    </h2>
+                </div>
+                <div id="options-container" class="grid grid-cols-1 gap-3">
+                    <!-- Options will be injected here -->
+                </div>
+                <div class="mt-8 text-center">
+                    <button id="next-btn" class="hidden w-1/2 bg-gray-700 text-white font-bold py-3 px-4 rounded-xl hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300 transition-all duration-300 shadow-md">Next Question</button>
+                </div>
+            </div>
+
+            <!-- Screen 3: Results -->
+            <div id="results-screen" class="hidden text-center">
+                 <h2 class="text-3xl font-bold mb-4 text-indigo-700">Quiz Completed!</h2>
+                 <p class="text-xl mb-2">Well done, <span id="result-name" class="font-semibold text-indigo-600"></span>!</p>
+                 <!-- Updated Results Box Style -->
+                 <div class="bg-indigo-100 rounded-xl p-8 my-6 inline-block shadow-lg">
+                    <p class="text-lg text-gray-700">Your Final Score is</p>
+                    <p id="final-score" class="text-6xl font-extrabold text-indigo-700 my-2">0 / 0</p>
+                    <p id="result-percentage" class="text-xl font-bold text-indigo-800"></p>
+                 </div>
+                 <p id="result-message" class="text-xl font-medium text-gray-800 mb-6"></p>
+
+                 <!-- Affiliate Marketing Banner Placeholder -->
+                 <div id="affiliate-banner" class="bg-yellow-50 border border-yellow-300 rounded-xl p-4 mt-8 mb-6 shadow-md">
+                    <h3 class="text-lg font-bold text-yellow-800 mb-2">📚 Recommended Study Material 📚</h3>
+                    <p class="text-sm text-gray-700 mb-3">
+                        Since you just tested on <span id="quiz-topic-display" class="font-semibold text-indigo-600"></span>, check out the best-selling resources below to boost your scores!
+                    </p>
+                    <a href="#" target="_blank" class="affiliate-link inline-block w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                        [AFFILIATE LINK: Buy Top Rated Prep Guide]
+                    </a>
+                 </div>
+
+                 <!-- Restart Button -->
+                 <button id="restart-btn" class="w-full md:w-auto bg-indigo-700 text-white font-bold py-3 px-6 rounded-xl hover:bg-indigo-800 focus:outline-none focus:ring-4 focus:ring-indigo-300 transition-all duration-300 shadow-lg">Start New Quiz</button>
+            </div>
+            
+        </div>
+        
+        <!-- Loading Modal -->
+        <div id="loading-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 flex flex-col items-center shadow-2xl">
+                <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24 mb-4" style="border-top-color: #4f46e5; animation: spinner 1.5s linear infinite;"></div>
+                <style>@keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+                <h3 class="text-lg font-semibold text-gray-700" id="loading-text">Generating Your Quiz...</h3>
+                <p class="text-gray-500">Please wait a moment.</p>
+            </div>
+        </div>
+
+        <!-- Payment Modal -->
+        <div id="payment-modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl p-8 max-w-sm w-full shadow-2xl text-center">
+                <h3 class="text-2xl font-bold text-indigo-700 mb-4">Unlock Unlimited Access!</h3>
+                <p class="text-gray-600 mb-6">Go **Premium** for a full month of unlimited quizzes and 50+ MCQs per topic.</p>
+                
+                <div class="bg-indigo-50 border-2 border-indigo-300 rounded-xl p-4 mb-6">
+                    <p class="text-3xl font-extrabold text-indigo-800">₹125 <span class="text-lg font-medium text-gray-500">/ Month</span></p>
+                </div>
+
+                <p class="text-sm font-semibold text-gray-700 mb-3">Scan this QR Code to pay via UPI (Example)</p>
+
+                <!-- UPI QR Code Placeholder -->
+                <img src="https://placehold.co/200x200/4f46e5/ffffff?text=UPI+QR+Code" alt="UPI QR Code" class="mx-auto border border-gray-300 rounded-lg mb-6">
+
+                <button id="confirm-payment-btn" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-300 transition-all duration-300 shadow-lg">
+                    I Have Paid (Simulated)
+                </button>
+                <button id="close-payment-modal" class="w-full mt-3 text-gray-600 font-medium py-2 rounded-xl hover:text-indigo-800 transition-colors">
+                    Close
+                </button>
+            </div>
+        </div>
+
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl relative shadow-md" role="alert">
+            <strong class="font-bold">Error!</strong>
+            <span class="block sm:inline" id="error-text"></span>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- FIREBASE SETUP ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Added getDoc, updateDoc, Timestamp, and collection for data management
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, setLogLevel, collection, query, where, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js"; 
+
+        // Firebase Global Setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'knowledge-test-portal-default';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let db;
+        let auth;
+        let userId = null;
+        let isAuthReady = false;
+        let userProfile = {}; // Store user profile, limits, and premium status here
+
+        setLogLevel('debug'); // Enable Firestore logs
+
+        // Initialization function
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing. Cannot initialize Firestore.");
+                return;
+            }
+
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                
+                // 1. Sign in
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                
+                // 2. Auth state listener (Crucial for getting the UID and loading profile)
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                    } else {
+                        // Fallback for anonymous or unauthenticated users
+                        userId = crypto.randomUUID(); 
+                    }
+                    isAuthReady = true;
+                    console.log("Firebase Auth Ready. User ID:", userId);
+                    await loadUserProfile(); // Load profile immediately after auth is ready
+                    updateUIStatus();
+                });
+
+            } catch (e) {
+                console.error("Error initializing Firebase:", e);
+            }
+        }
+
+        // Call initialization on load
+        initializeFirebase();
+
+        // --- FIREBASE DATA MANAGEMENT ---
+
+        const QUIZ_LIMIT = 3; // Max free quizzes per day
+        const MAX_FREE_MCQS = 10; // Max MCQs per quiz for free users
+
+        function getProfileDocRef() {
+            if (!userId || !db) return null;
+            // Path: /artifacts/{appId}/users/{userId}/user_data/profile
+            return doc(db, 'artifacts', appId, 'users', userId, 'user_data', 'profile');
+        }
+        
+        async function loadUserProfile() {
+            const docRef = getProfileDocRef();
+            if (!docRef) return;
+
+            try {
+                const docSnap = await getDoc(docRef);
+                const today = new Date().toDateString();
+
+                if (docSnap.exists()) {
+                    userProfile = docSnap.data();
+                    
+                    // Check if premium subscription has expired
+                    if (userProfile.premiumExpiry && new Date() > userProfile.premiumExpiry.toDate()) {
+                        userProfile.isPremium = false;
+                        console.log("Premium subscription expired.");
+                        // Optionally update Firestore to reflect expiration
+                        await updateDoc(docRef, { isPremium: false, premiumExpiry: null });
+                    }
+
+                    // Reset daily quiz count if it's a new day
+                    if (userProfile.lastQuizDate !== today) {
+                        userProfile.dailyQuizCount = 0;
+                        await updateDoc(docRef, { dailyQuizCount: 0, lastQuizDate: today });
+                    }
+
+                    console.log("User Profile loaded:", userProfile);
+                } else {
+                    // Initialize new profile
+                    userProfile = {
+                        name: '',
+                        email: '',
+                        contact: '',
+                        isPremium: false,
+                        dailyQuizCount: 0,
+                        lastQuizDate: today,
+                        premiumExpiry: null,
+                    };
+                    // Will be saved fully when the user submits the form
+                }
+            } catch (error) {
+                console.error("Error loading user profile:", error);
+            }
+        }
+
+        async function saveContactAndProfile(name, email, contact) {
+            if (!isAuthReady || !db || !userId) {
+                console.warn("Firestore not ready or user ID missing. Cannot save data.");
+                return false;
+            }
+            
+            const docRef = getProfileDocRef();
+            const today = new Date().toDateString();
+
+            // Update local profile with new contact data
+            userProfile.name = name;
+            userProfile.email = email;
+            userProfile.contact = contact;
+
+            const profileData = {
+                ...userProfile, // Keep existing premium/count data
+                name: name,
+                email: email,
+                contact: contact,
+                // Ensure daily count is initialized/reset correctly
+                dailyQuizCount: userProfile.lastQuizDate === today ? (userProfile.dailyQuizCount || 0) : 0,
+                lastQuizDate: today,
+                registrationTimestamp: userProfile.registrationTimestamp || Timestamp.now()
+            };
+
+            try {
+                await setDoc(docRef, profileData, { merge: true });
+                // Update local state with the saved data
+                userProfile = profileData;
+                console.log("User profile saved/updated successfully.");
+                return true;
+            } catch (error) {
+                console.error("Error saving user profile to Firestore:", error);
+                showError("Failed to save profile. Please check your connection.");
+                return false;
+            }
+        }
+        
+        async function incrementQuizCount() {
+            if (userProfile.isPremium) return; // No limit for premium users
+
+            if (userProfile.dailyQuizCount < QUIZ_LIMIT) {
+                userProfile.dailyQuizCount++;
+                const docRef = getProfileDocRef();
+                try {
+                    await updateDoc(docRef, { dailyQuizCount: userProfile.dailyQuizCount });
+                    updateUIStatus();
+                } catch (error) {
+                    console.error("Error incrementing quiz count:", error);
+                }
+            }
+        }
+
+        async function purchasePremium() {
+            const docRef = getProfileDocRef();
+            if (!docRef) {
+                showError("Cannot process payment. User profile is not accessible.");
+                return;
+            }
+
+            // Calculate new expiry date (30 days from now)
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 30);
+
+            try {
+                await updateDoc(docRef, { 
+                    isPremium: true,
+                    premiumExpiry: Timestamp.fromDate(expiryDate),
+                    dailyQuizCount: 0 // Reset free limit upon upgrade
+                });
+                userProfile.isPremium = true;
+                userProfile.premiumExpiry = Timestamp.fromDate(expiryDate);
+                userProfile.dailyQuizCount = 0;
+                console.log("Premium status granted until:", expiryDate.toISOString());
+                
+                // Close modal, show success, and allow quiz generation
+                paymentModal.classList.add('hidden');
+                updateUIStatus();
+                // Re-submit the form logic to start the quiz
+                // We pass a dummy event object so the handler doesn't fail
+                handleFormSubmit(new Event('submit', { bubbles: true, cancelable: true })); 
+
+            } catch (error) {
+                console.error("Error setting premium status:", error);
+                showError("Failed to update premium status. Please try again.");
+            }
+        }
+
+        // --- UI & APP LOGIC (REST OF THE SCRIPT) ---
+
+        const setupScreen = document.getElementById('setup-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultsScreen = document.getElementById('results-screen');
+        const setupForm = document.getElementById('setup-form');
+        const loadingModal = document.getElementById('loading-modal');
+        const loadingText = document.getElementById('loading-text');
+        const paymentModal = document.getElementById('payment-modal');
+        const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
+        const closePaymentModalBtn = document.getElementById('close-payment-modal');
+        const userStatusEl = document.getElementById('user-status');
+        const countInput = document.getElementById('count');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const affiliateLinkEl = document.querySelector('.affiliate-link');
+        const quizTopicDisplayEl = document.getElementById('quiz-topic-display');
+        
+        const scoreEl = document.getElementById('score');
+        const timeLeftEl = document.getElementById('time-left');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        
+        // FIX: Define the error message elements here
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        
+        const MAX_QUIZ_MCQS = 50; // Max allowed MCQs for Premium
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let timer;
+        const TIME_LIMIT = 45;
+
+        // Event Listeners
+        setupForm.addEventListener('submit', handleFormSubmit);
+        nextBtn.addEventListener('click', loadNextQuestion);
+        restartBtn.addEventListener('click', restartQuiz);
+        confirmPaymentBtn.addEventListener('click', purchasePremium);
+        closePaymentModalBtn.addEventListener('click', () => paymentModal.classList.add('hidden'));
+
+        // Input validation listener for quiz count
+        countInput.addEventListener('input', () => {
+            const maxAllowed = userProfile.isPremium ? MAX_QUIZ_MCQS : MAX_FREE_MCQS;
+            const currentVal = parseInt(countInput.value);
+
+            countInput.setAttribute('max', maxAllowed);
+
+            if (currentVal > maxAllowed) {
+                countInput.value = maxAllowed;
+                if (!userProfile.isPremium) {
+                    showError(`Free users are limited to ${MAX_FREE_MCQS} MCQs. Upgrade for more!`);
+                }
+            } else if (currentVal < 1) {
+                countInput.value = 1;
+            }
+        });
+        
+        function updateUIStatus() {
+            if (!isAuthReady || !userProfile) {
+                userStatusEl.innerHTML = `<span class="text-indigo-500">Connecting to portal...</span>`;
+                return;
+            }
+
+            const isPremium = userProfile.isPremium;
+            const dailyCount = userProfile.dailyQuizCount || 0;
+            
+            if (isPremium) {
+                const expiryDate = userProfile.premiumExpiry.toDate().toLocaleDateString();
+                userStatusEl.innerHTML = `<span class="text-green-600 font-bold">PREMIUM ACCESS</span> | Expires: ${expiryDate}`;
+                countInput.setAttribute('max', MAX_QUIZ_MCQS);
+                countInput.placeholder = `Max ${MAX_QUIZ_MCQS} MCQs (Unlimited Access)`;
+            } else {
+                const remaining = QUIZ_LIMIT - dailyCount;
+                if (remaining > 0) {
+                    userStatusEl.innerHTML = `<span class="text-gray-700">Free Quizzes Left Today: </span><span class="font-bold text-indigo-600">${remaining} / ${QUIZ_LIMIT}</span>`;
+                } else {
+                    userStatusEl.innerHTML = `<span class="text-red-600 font-bold">DAILY LIMIT REACHED!</span> <button onclick="window.showPaymentModal()" class="text-indigo-600 hover:underline">Go Premium?</button>`;
+                }
+                countInput.setAttribute('max', MAX_FREE_MCQS);
+                countInput.placeholder = `Max ${MAX_FREE_MCQS} MCQs`;
+            }
+        }
+
+        // Expose to global scope for HTML button onclick
+        window.showPaymentModal = () => {
+            paymentModal.classList.remove('hidden');
+        };
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            hideError(); // This now works because errorMessage is defined
+
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const topic = document.getElementById('topic').value.trim();
+            const count = parseInt(document.getElementById('count').value);
+
+            if (!name || !email || !contact || !topic || !count) {
+                showError("Please ensure all profile fields and quiz topic/count are filled.");
+                return;
+            }
+
+            // 1. Save/Update user profile first
+            const success = await saveContactAndProfile(name, email, contact);
+            if (!success) return; // Exit if profile save failed
+
+            // 2. Check Limits
+            if (!userProfile.isPremium) {
+                if (userProfile.dailyQuizCount >= QUIZ_LIMIT) {
+                    showError("You have reached your limit of 3 free quizzes for today. Please go premium for unlimited access!");
+                    showPaymentModal();
+                    return;
+                }
+                if (count > MAX_FREE_MCQS) {
+                    showError(`Free users are limited to ${MAX_FREE_MCQS} MCQs per quiz. Please reduce the count or go premium.`);
+                    return;
+                }
+            } else if (count > MAX_QUIZ_MCQS) {
+                 // For premium users, enforce the absolute max if they try to ask for too much
+                 showError(`Maximum allowed MCQs per request is ${MAX_QUIZ_MCQS}.`);
+                 document.getElementById('count').value = MAX_QUIZ_MCQS;
+                 return;
+            }
+
+            // 3. Proceed to generate quiz
+            await generateQuiz(topic, count);
+        }
+
+        async function generateQuiz(topic, count) {
+            loadingModal.classList.remove('hidden');
+            loadingText.textContent = `Generating ${count} MCQs on ${topic}...`;
+
+            const systemPrompt = `You are an AI assistant that creates advanced, bilingual (English/Hindi) multiple-choice questions for competitive and academic exams. The user wants ${count} questions on the topic "${topic}". You must generate a JSON array of question objects based on the provided schema. Each question must have exactly 5 distinct options. The questions should be challenging and suitable for exam preparation. Ensure the Hindi translations are accurate and natural. If you cannot generate questions, return an empty array.`;
+
+            const payload = {
+                contents: [{ parts: [{ text: `Generate ${count} MCQs on the topic: ${topic}` }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: {
+                            type: "OBJECT",
+                            properties: {
+                                question_en: { type: "STRING", description: "The question in English." },
+                                question_hi: { type: "STRING", description: "The question in Hindi." },
+                                options: {
+                                    type: "ARRAY",
+                                    description: "An array of 5 options.",
+                                    items: {
+                                        type: "OBJECT",
+                                        properties: {
+                                            en: { type: "STRING", description: "The option text in English." },
+                                            hi: { type: "STRING", description: "The option text in Hindi." }
+                                        },
+                                        required: ["en", "hi"]
+                                    }
+                                },
+                                correct_answer_index: { type: "INTEGER", description: "The 0-based index of the correct answer in the options array." }
+                            },
+                            required: ["question_en", "question_hi", "options", "correct_answer_index"]
+                        }
+                    }
+                }
+            };
+            
+            // Retries logic for robustness (1s, 2s, 4s, 8s max 3 retries)
+            const MAX_RETRIES = 3;
+            let delay = 1000;
+            let response;
+            
+            for (let i = 0; i < MAX_RETRIES; i++) {
+                try {
+                     const apiKey = ""; // API key is handled by the environment
+                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                     response = await fetch(apiUrl, {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify(payload)
+                     });
+
+                     if (response.status !== 429 && response.ok) { 
+                         break; 
+                     } else if (response.status === 429) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2; 
+                        continue;
+                     } else {
+                         throw new Error(`API error: ${response.status} ${response.statusText}`);
+                     }
+                } catch (error) {
+                    if (i === MAX_RETRIES - 1) throw error; 
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2; 
+                }
+            }
+
+
+            try {
+                if (!response || !response.ok) {
+                    throw new Error("Failed to connect to the quiz generation service after multiple retries.");
+                }
+
+                 const result = await response.json();
+                 
+                 if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
+                     const jsonText = result.candidates[0].content.parts[0].text;
+                     let parsedJson;
+                     try {
+                        parsedJson = JSON.parse(jsonText);
+                     } catch(e) {
+                         // Attempt to clean markdown wrapper if present
+                         const cleanJsonText = jsonText.replace(/^```json\s*/, '').replace(/\s*```$/, '').trim();
+                         parsedJson = JSON.parse(cleanJsonText);
+                     }
+
+
+                     if (parsedJson && parsedJson.length > 0) {
+                        questions = parsedJson;
+                        // Increment limit *only* if quiz generation was successful and the user is free
+                        if (!userProfile.isPremium) {
+                            await incrementQuizCount();
+                        }
+                        startQuiz(topic);
+                     } else {
+                        throw new Error("The model could not generate questions for this topic. Please try a different or more specific topic.");
+                     }
+                 } else {
+                    throw new Error("Received an invalid response from the AI. Please try again.");
+                 }
+
+            } catch (error) {
+                console.error('Error generating quiz:', error);
+                showError(error.message || "Failed to generate quiz. Please check your connection and try again.");
+            } finally {
+                loadingModal.classList.add('hidden');
+            }
+        }
+
+        function startQuiz(topic) {
+            currentQuestionIndex = 0;
+            score = 0;
+            // Store topic for affiliate banner on results screen
+            localStorage.setItem('currentQuizTopic', topic); 
+            
+            setupScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            displayQuestion();
+        }
+
+        // ... (displayQuestion, resetState, startTimer, handleTimeout, selectAnswer, loadNextQuestion, updateScore functions remain the same) ...
+        
+        function displayQuestion() {
+            resetState();
+            if (currentQuestionIndex >= questions.length) {
+                showResults();
+                return;
+            }
+
+            const currentQuestion = questions[currentQuestionIndex];
+            questionTextEl.innerHTML = `
+                <span class="block">Q${currentQuestionIndex + 1}. ${currentQuestion.question_en}</span>
+                <span class="block text-gray-600 text-lg mt-1">${currentQuestion.question_hi}</span>
+            `;
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('w-full', 'text-left', 'p-4', 'border', 'border-gray-300', 'rounded-xl', 'hover:bg-indigo-50', 'transition', 'duration-200', 'shadow-sm'); 
+                button.innerHTML = `
+                    <div class="bilingual-text">
+                        <span class="font-medium">${option.en}</span>
+                        <span class="text-sm text-gray-500 mt-1">${option.hi}</span>
+                    </div>`;
+                button.dataset.index = index;
+                button.addEventListener('click', () => selectAnswer(button));
+                optionsContainer.appendChild(button);
+            });
+            
+            updateScore();
+            startTimer();
+        }
+
+        function resetState() {
+            clearTimeout(timer);
+            optionsContainer.innerHTML = '';
+            nextBtn.classList.add('hidden');
+        }
+
+        function startTimer() {
+            let timeLeft = TIME_LIMIT;
+            timeLeftEl.textContent = timeLeft;
+
+            timer = setInterval(() => {
+                timeLeft--;
+                timeLeftEl.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            selectAnswer(null); 
+        }
+
+        function selectAnswer(selectedButton) {
+            clearInterval(timer);
+            const correctIndex = questions[currentQuestionIndex].correct_answer_index;
+
+            Array.from(optionsContainer.children).forEach((button, index) => {
+                button.classList.add('disabled-option'); 
+                if (index === correctIndex) {
+                    button.classList.add('correct');
+                }
+            });
+
+            if (selectedButton) {
+                const selectedIndex = parseInt(selectedButton.dataset.index);
+                if (selectedIndex === correctIndex) {
+                    score++;
+                } else {
+                    selectedButton.classList.add('incorrect');
+                }
+            } 
+            
+            updateScore();
+            nextBtn.classList.remove('hidden');
+        }
+
+        function loadNextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function updateScore() {
+            scoreEl.textContent = `Score: ${score} / ${questions.length}`;
+        }
+
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            const name = userProfile.name || document.getElementById('name').value || "User";
+            document.getElementById('result-name').textContent = name;
+            
+            document.getElementById('final-score').textContent = `${score} / ${questions.length}`;
+            
+            const percentage = questions.length > 0 ? ((score / questions.length) * 100) : 0;
+            document.getElementById('result-percentage').textContent = `${percentage.toFixed(1)}% Correct`;
+
+            const resultMessageEl = document.getElementById('result-message');
+            if (percentage === 100) {
+                resultMessageEl.textContent = "Bravo..... Do not loose your focus you are on right path.";
+                resultMessageEl.className = "text-xl font-bold text-green-600 mb-6";
+            } else if (percentage >= 90) {
+                resultMessageEl.textContent = "Excellent! Just one more step to succeed.";
+                resultMessageEl.className = "text-xl font-bold text-green-500 mb-6";
+            } else if (percentage >= 75) {
+                resultMessageEl.textContent = "Well done... you are on the right track!";
+                resultMessageEl.className = "text-xl font-bold text-indigo-600 mb-6";
+            } else {
+                resultMessageEl.textContent = "No worry, push yourself more....";
+                resultMessageEl.className = "text-xl font-bold text-yellow-600 mb-6";
+            }
+            
+            // Affiliate Banner Update
+            const currentTopic = localStorage.getItem('currentQuizTopic') || 'Your Topic';
+            quizTopicDisplayEl.textContent = currentTopic;
+
+            // This is where you would dynamically set a real affiliate URL based on `currentTopic`
+            affiliateLinkEl.href = `https://affiliatesite.com/search?q=${encodeURIComponent(currentTopic.replace('Generate MCQs on', '').trim())}`;
+        }
+
+        function restartQuiz() {
+            questions = [];
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            document.getElementById('topic').value = ''; 
+            document.getElementById('count').value = '10'; // Reset count to default
+            
+            resultsScreen.classList.add('hidden');
+            quizScreen.classList.add('hidden');
+            setupScreen.classList.remove('hidden');
+            updateUIStatus(); // Refresh limits
+            hideError();
+        }
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+
+    </script>
+</body>
+</html>
